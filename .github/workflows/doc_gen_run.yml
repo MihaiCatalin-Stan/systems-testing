@@ -15,12 +15,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Run Doxygen
-        run: |
-          sudo apt install doxygen
-          doxygen -g
-          doxygen Doxyfile
-
       - name: Upload documentation as an artifact
         uses: actions/upload-artifact@v4
         with:
