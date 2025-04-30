@@ -17,6 +17,8 @@ jobs:
 
       - name: Run Doxygen
         run: |
+          sudo apt install doxygen
+          doxygen -g
           doxygen Doxyfile
 
       - name: Upload documentation as an artifact
