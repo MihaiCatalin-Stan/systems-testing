@@ -1,0 +1,26 @@
+name: Generate Documentation with Doxygen
+
+on:
+  push:
+    tags:
+      - 'v*'  # Acțiunea va fi declanșată doar atunci când un tag nou este creat, de exemplu v1.0.0, v2.1.1 etc.
+
+jobs:
+  run:
+    name: 🚀 Run
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Doxygen
+        run: |
+          doxygen Doxyfile
+
+      - name: Upload documentation as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation
+          path: docs/html
