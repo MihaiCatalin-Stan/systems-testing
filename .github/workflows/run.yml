@@ -24,4 +24,5 @@ jobs:
       
       - name: Run unit tests
         run: |
+          cd laboratories/cicd-documentation
           python3 -m unittest discover -s . -p "test_*.py" -v
