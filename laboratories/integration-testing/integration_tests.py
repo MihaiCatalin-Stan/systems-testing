@@ -43,7 +43,28 @@ def test_create_task(user_id):
 
     Hint: În răspunsul de la /get-task nu vei mai avea `user_id`, deci verifică doar ce este disponibil.
     """
-    pass
+    content = "content"
+    is_done = False
+
+    create_payload = {
+        "user_id": user_id,
+        "content": content,
+        "is_done": is_done
+    }
+
+    put_resp = requests.put(f"{BASE_URL}/create-task", json=create_payload)
+    assert put_resp.status_code == 200
+
+    task_id = put_resp.json()["task"]["task_id"]
+    get_resp = requests.get(f"{BASE_URL}/get-task/{task_id}")
+    assert get_resp.status_code == 200
+
+    task = get_resp.json()["task"]
+    assert task["user_id"] == user_id
+    assert task["content"] == content
+    assert task["is_done"] == is_done
+
+    #pass
 
 
 def test_update_task(sample_task):
@@ -58,7 +79,27 @@ def test_update_task(sample_task):
 
     Hint: În răspunsul de la /update-task primești doar `updated_task_id`.
     """
-    pass
+    new_content = "Updated content"
+    new_is_done = True
+
+    update_payload = {
+        "user_id": sample_task["user_id"],
+        "task_id": sample_task["task_id"],
+        "content": new_content,
+        "is_done": new_is_done
+    }
+
+    update_resp = requests.put(f"{BASE_URL}/update-task", json=update_payload)
+    assert update_resp.status_code == 200
+    assert "updated_task_id" in update_resp.json()
+
+    get_resp = requests.get(f"{BASE_URL}/get-task/{sample_task['task_id']}")
+    assert get_resp.status_code == 200
+    updated_task = get_resp.json()["task"]
+    assert updated_task["content"] == new_content
+    assert updated_task["is_done"] == new_is_done
+
+    #pass
 
 
 def test_list_multiple_tasks(user_id):
@@ -72,7 +113,22 @@ def test_list_multiple_tasks(user_id):
 
     Hint: Folosește un user_id unic pentru a evita datele altor colegi.
     """
-    pass
+    for i in range(3):
+        requests.put(f"{BASE_URL}/create-task", json={
+            "user_id": user_id,
+            "content": f"Task {i}",
+            "is_done": False
+        })
+
+    list_resp = requests.get(f"{BASE_URL}/list-tasks/{user_id}")
+    assert list_resp.status_code == 200
+
+    tasks = list_resp.json()["tasks"]
+    assert len(tasks) == 3
+    for task in tasks:
+        assert task["user_id"] == user_id
+
+    #pass
 
 
 def test_delete_task(sample_task):
@@ -85,7 +141,13 @@ def test_delete_task(sample_task):
     3. Verifică status-ul (200).
     4. Încearcă să faci GET pe acel task și verifică că primești 404.
     """
-    pass
+    delete_resp = requests.delete(f"{BASE_URL}/delete-task/{sample_task['task_id']}")
+    assert delete_resp.status_code == 200
+
+    get_resp = requests.get(f"{BASE_URL}/get-task/{sample_task['task_id']}")
+    assert get_resp.status_code == 404
+
+    #pass
 
 
 def test_get_nonexistent_task():
@@ -99,7 +161,12 @@ def test_get_nonexistent_task():
 
     Hint: Nu este nevoie să creezi nimic, doar folosește un id invalid (unic).
     """
-    pass
+    fake_task_id = str(uuid.uuid4())
+
+    get_resp = requests.get(f"{BASE_URL}/get-task/{fake_task_id}")
+    assert get_resp.status_code == 404
+
+    #pass
 
 
 def test_update_nonexistent_task(user_id):
@@ -113,7 +180,26 @@ def test_update_nonexistent_task(user_id):
 
     Hint: Dacă operația se execută cu succes, puteți face verificarea folosind GET.
     """
-    pass
+    fake_task_id = str(uuid.uuid4())
+
+    update_payload = {
+        "user_id": user_id,
+        "task_id": fake_task_id,
+        "content": "Created via update",
+        "is_done": True
+    }
+
+    update_resp = requests.put(f"{BASE_URL}/update-task", json=update_payload)
+    assert update_resp.status_code == 200
+
+    get_resp = requests.get(f"{BASE_URL}/get-task/{fake_task_id}")
+    assert get_resp.status_code == 200
+    task = get_resp.json()["task"]
+    assert task["task_id"] == fake_task_id
+    assert task["content"] == "Created via update"
+    assert task["is_done"] is True
+
+    #pass
 
 
 def test_delete_nonexistent_task():
@@ -127,7 +213,12 @@ def test_delete_nonexistent_task():
 
     Hint: Validează că operația e "safe", adică nu aruncă excepție.
     """
-    pass
+    fake_task_id = str(uuid.uuid4())
+
+    delete_resp = requests.delete(f"{BASE_URL}/delete-task/{fake_task_id}")
+    assert delete_resp.status_code == 404
+
+    #pass
 
 def test_create_task_invalid_data():
     """
@@ -137,5 +228,14 @@ def test_create_task_invalid_data():
     1. Trimite un request cu date invalide (ex: is_done="some_string").
     2. Verifică statusul și mesajul de eroare.
     """
-    pass
+    invalid_payload = {
+        "user_id": str(uuid.uuid4()),
+        "content": "Invalid is_done field",
+        "is_done": "not-a-boolean"
+    }
+
+    resp = requests.put(f"{BASE_URL}/create-task", json=invalid_payload)
+    assert resp.status_code == 422
+
+    #pass
 
