@@ -9,7 +9,10 @@ def test_add_and_list_tasks(regtest):
     3. Obține lista taskurilor cu metoda list_tasks().
     4. Scrie rezultatul în regtest (folosind regtest.write()).
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    tm.add_task("Task 2")
+    regtest.write(tm.list_tasks())
 
 def test_mark_done_task(regtest):
     """
@@ -20,7 +23,10 @@ def test_mark_done_task(regtest):
     
     Hint: folosește metoda mark_done(index).
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    tm.mark_done(0)
+    regtest.write(tm.list_tasks())
 
 def test_delete_task(regtest):
     """
@@ -31,7 +37,11 @@ def test_delete_task(regtest):
     
     Hint: folosește metoda delete_task(index).
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    tm.add_task("Task 2")
+    tm.delete_task(0)
+    regtest.write(tm.list_tasks())
 
 def test_edit_task(regtest):
     """
@@ -42,7 +52,10 @@ def test_edit_task(regtest):
     
     Hint: folosește metoda edit_task(index, noua_descriere).
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Original Task")
+    tm.edit_task(0, "Updated Task")
+    regtest.write(tm.list_tasks())  
 
 def test_combination_operations(regtest):
     """
@@ -55,7 +68,13 @@ def test_combination_operations(regtest):
     
     Hint: combină metodele add_task, mark_done, edit_task, delete_task.
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    tm.add_task("Task 2")
+    tm.mark_done(1)
+    tm.edit_task(0, "Modified Task 1")
+    tm.delete_task(1)
+    regtest.write(tm.list_tasks())
 
 def test_invalid_index_mark_done(regtest):
     """
@@ -66,7 +85,12 @@ def test_invalid_index_mark_done(regtest):
     
     Hint: folosește try-except și str(e) ca să obții mesajul excepției.
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    try:
+        tm.mark_done(5)
+    except IndexError as e:
+        regtest.write(str(e))
 
 def test_invalid_index_delete(regtest):
     """
@@ -77,7 +101,12 @@ def test_invalid_index_delete(regtest):
     
     Hint: la fel ca la test_invalid_index_mark_done.
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    try:
+        tm.delete_task(-1)
+    except IndexError as e:
+        regtest.write(str(e))
 
 def test_invalid_index_edit(regtest):
     """
@@ -88,4 +117,9 @@ def test_invalid_index_edit(regtest):
     
     Hint: folosește try-except și scrie mesajul excepției.
     """
-    pass
+    tm = TaskManager()
+    tm.add_task("Task 1")
+    try:
+        tm.edit_task(2, "New Description")
+    except IndexError as e:
+        regtest.write(str(e))
